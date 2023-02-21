@@ -2,16 +2,37 @@ import sys
 import pandas as pd
 from sqlalchemy import create_engine
 
+
 def load_data(messages_filepath, categories_filepath):
+    '''Loads Data From CSV Files
+
+        Args:
+            messages_filepath (str): The path of the messages csv file
+            categories_filepath (bool): The path of the categories csv file
+
+        Returns:
+            data (pd.DataFrame): A DataFrame containing messages with  their 
+            corresponding categories
+    '''
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
-    return pd.merge(messages, categories, how='outer', on='id')
+    data = pd.merge(messages, categories, how='outer', on='id')
+    return data
 
 
 def clean_data(df):
+    '''Cleans Data, removing duplicates, proper column names 
+       and category values
+
+        Args:
+            df (pd.DataFrame): Pandas DataFrame with column conatining messages  
+
+        Returns:
+            cleaned_data (pd.DataFrame): A Clean DataFrame
+    '''
     categories = df.categories.str.split(';', expand=True)
     row = categories.iloc[0]
-    category_colnames = categories.iloc[0].apply(lambda x: x[:-2]).tolist()
+    category_colnames = row.apply(lambda x: x[:-2]).tolist()
     categories.columns = category_colnames
     for column in categories:
     # set each value to be the last character of the string
@@ -25,6 +46,16 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    '''Stores the cleaned data in the sqlite DB
+
+        Args:
+            df (pd.DataFrame): Pandas DataFrame with
+            messages and categories data
+            database_filename (str): Filename of the sqlite Db for Storage
+
+        Returns:
+            None: Store Cleaned Data in DB
+    '''
     engine = create_engine(f'sqlite:///{database_filename}')
     df.to_sql('Messages', engine, index=False)
 
