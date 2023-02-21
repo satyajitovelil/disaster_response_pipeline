@@ -42,4 +42,6 @@ project
     ├── ML Pipeline Preparation.ipynb : Notebook for preparing ML pipeline 
     └── train_classifier.py : Script to process text and train classifier
 ```
-
+### Acknowledgements
+[Figure Eight](https://www.figure-eight.com/) for providing Data.
+[Data Science StackExchange](https://datascience.stackexchange.com/) for info on combining TFIF with other transformations.
