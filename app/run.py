@@ -7,7 +7,7 @@ from nltk.tokenize import word_tokenize
 
 from flask import Flask
 from flask import render_template, request, jsonify
-from plotly.graph_objs import Bar
+from plotly.graph_objs import Bar, Pie
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
 
@@ -39,29 +39,28 @@ model = joblib.load("../models/classifier.pkl")
 def index():
     
     # extract data needed for visuals
-    # TODO: Below is an example - modify to extract data for your own visuals
-    genre_counts = df.groupby('genre').count()['message']
-    genre_names = list(genre_counts.index)
-    
+    df_categories = df.drop(['id', 'message', 'original'], axis=1)
+    df_grouped = df_categories.groupby(['genre'])
+    cat_info = pd.DataFrame(df_grouped.sum().unstack(), columns=['Count'])
+    cat_info.reset_index(inplace=True)
+    cat_info.rename(columns={'level_0':'category'}, inplace=True)
+    labels, values = cat_info.category, cat_info.Count
     # create visuals
-    # TODO: Below is an example - modify to create your own visuals
     graphs = [
         {
             'data': [
-                Bar(
-                    x=genre_names,
-                    y=genre_counts
+                Pie(
+                    labels=labels,
+                    values=values
                 )
             ],
 
             'layout': {
-                'title': 'Distribution of Message Genres',
-                'yaxis': {
-                    'title': "Count"
-                },
-                'xaxis': {
-                    'title': "Genre"
-                }
+                'autosize': False,
+                'height': 500,
+                'margin': {'b': 30, 'l': 10, 'r': 0, 't': 30},
+                'title': {'text': 'Pie Chart of Message Categories'},
+                'width': 1000
             }
         }
     ]
@@ -84,7 +83,7 @@ def go():
     classification_labels = model.predict([query])[0]
     classification_results = dict(zip(df.columns[4:], classification_labels))
 
-    # This will render the go.html Please see that file. 
+    # This will render the go.html Please see that file.
     return render_template(
         'go.html',
         query=query,
