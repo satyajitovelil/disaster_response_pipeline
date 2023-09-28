@@ -44,4 +44,4 @@ project
 ```
 ### Acknowledgements
 [Figure Eight](https://www.figure-eight.com/) for providing Data.
-[Data Science StackExchange](https://datascience.stackexchange.com/) for info on combining TFIF with other transformations.
+[Data Science StackExchange](https://datascience.stackexchange.com/) for info on combining TFIDF with other transformations.
